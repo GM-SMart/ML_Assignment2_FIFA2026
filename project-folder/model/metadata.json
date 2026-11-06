@@ -12,7 +12,6 @@
   },
   "numeric_features": [
     "age",
-    "jersey_number",
     "height_cm",
     "weight_kg",
     "market_value_eur",
@@ -56,17 +55,11 @@
     "sprint_distance_km",
     "accelerations",
     "decelerations",
-    "stamina_score",
-    "player_of_match_awards"
+    "stamina_score"
   ],
   "categorical_features": [
-    "nationality",
-    "team",
     "position",
     "preferred_foot",
-    "stadium",
-    "city",
-    "opponent_team",
     "tournament_stage",
     "match_result"
   ],
@@ -84,16 +77,24 @@
       "total_goals_tournament",
       "total_assists_tournament",
       "total_minutes_tournament",
+      "player_of_match_awards",
       "tournament_rating"
     ],
     "identifier": [
       "player_id",
       "player_name",
+      "jersey_number",
       "club_name",
       "match_id",
       "match_date"
     ],
-    "high_cardinality_text": [],
+    "high_cardinality_text": [
+      "nationality",
+      "team",
+      "stadium",
+      "city",
+      "opponent_team"
+    ],
     "constant": [],
     "high_corr_with_rating": [
       "top_speed_kmh"
@@ -110,7 +111,7 @@
       "clf__min_samples_leaf": 1
     },
     "KNN": {
-      "clf__n_neighbors": 21
+      "clf__n_neighbors": 11
     },
     "Naive Bayes": {
       "clf__var_smoothing": 1e-09
@@ -123,11 +124,11 @@
     }
   },
   "train_accuracy": {
-    "Logistic Regression": 0.8833562271062271,
+    "Logistic Regression": 0.8824175824175824,
     "Decision Tree": 0.9273122710622711,
-    "KNN": 0.8874771062271062,
-    "Naive Bayes": 0.8340201465201466,
-    "Support Vector Machine": 0.9272893772893773
+    "KNN": 0.9036172161172161,
+    "Naive Bayes": 0.8346611721611722,
+    "Support Vector Machine": 0.9273351648351649
   },
   "model_files": {
     "Logistic Regression": "logistic_regression.pkl",
@@ -137,7 +138,7 @@
     "Support Vector Machine": "svm.pkl"
   },
   "versions": {
-    "python": "3.14.7",
+    "python": "3.13.9",
     "scikit-learn": "1.9.1",
     "numpy": "2.5.4",
     "pandas": "3.1.1",

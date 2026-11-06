@@ -9,7 +9,7 @@ What this script does (end-to-end, reproducible):
          high_performer = 1  if player_rating >= median(player_rating)  else 0
   3. Removes identifier columns, high-cardinality text columns and every column
      that would leak the target (rating-derived / post-match composite scores,
-     tournament-total aggregates, Player-of-the-Match flag).
+     tournament-total aggregates, Player-of-the-Match awards).
   4. Splits the data 80/20 (stratified, random_state=42) and saves the 20% hold-out
      split as test_data.csv (used by the Streamlit app).
   5. Trains the 5 required classifiers inside identical preprocessing pipelines:
@@ -24,13 +24,13 @@ Run from the project root:
 """
 
 import argparse
-import warnings
 import glob
 import json
 import os
 import re
 import sys
 import time
+import warnings
 
 import joblib
 import numpy as np
@@ -80,11 +80,12 @@ LEAKAGE_PATTERNS = [
     r"contribution",               # offensive_/defensive_contribution (composite scores)
     r"possession_impact", r"pressure_resistance", r"creativity_score",
     r"consistency_score", r"clutch",
-    r"player_of_the_match", r"potm", r"motm", r"man_of_the_match",
+    r"player_of_the_match", r"player_of_match", r"potm", r"motm",
+    r"man_of_the_match", r"awards",
     r"^total_.*_tournament$", r"_tournament$",   # whole-tournament aggregates (future info)
 ]
 # Identifier / free-text columns that carry no generalisable signal
-ID_PATTERNS = [r"(^|_)id$", r"(^|_)name$", r"date", r"time$"]
+ID_PATTERNS = [r"(^|_)id$", r"(^|_)name$", r"date", r"time$", r"jersey"]
 
 
 # ----------------------------------------------------------------------------
@@ -184,7 +185,7 @@ def main():
             dropped["identifier"].append(c)
         elif raw[c].nunique(dropna=True) <= 1:
             dropped["constant"].append(c)
-        elif (raw[c].dtype == object or str(raw[c].dtype) == "category") and \
+        elif (not pd.api.types.is_numeric_dtype(raw[c])) and \
                 raw[c].nunique() > MAX_CATEGORIES:
             dropped["high_cardinality_text"].append(c)
         else:
@@ -338,17 +339,17 @@ def observations(m: pd.DataFrame, meta: dict) -> dict:
     o = {}
     o["Logistic Regression"] = head("Logistic Regression") + gap_txt("Logistic Regression") + (
         "This linear model is as good as or better than the non-linear models, so the rating is driven "
-        "mostly by additive effects of goals, assists, chance creation and passing quality. "
+        "mostly by additive effects. "
         if lr.MCC >= max(dt.MCC, knn.MCC, svm.MCC) - 0.01 else
         "It is beaten by the non-linear models, which means interactions between the statistics "
-        "(for example, position combined with defensive actions) matter. A single linear boundary misses these. ") + (
+        "matter. A single linear boundary misses these. ") + (
         f"Precision ({lr.Precision:.3f}) and recall ({lr.Recall:.3f}) are balanced."
         if abs(lr.Precision - lr.Recall) < 0.05 else
         f"It favours {'precision' if lr.Precision > lr.Recall else 'recall'} "
         f"(P={lr.Precision:.3f}, R={lr.Recall:.3f}).")
     o["Decision Tree"] = head("Decision Tree") + gap_txt("Decision Tree") + (
         f"The tuned tree ({params('Decision Tree')}) is pruned to limit variance. "
-        "Axis-aligned threshold splits capture non-linear rules (for example, goals ≥ 1 together with a high pass accuracy), "
+        "Axis-aligned threshold splits capture non-linear rules, "
         + ("so it beats the linear baseline."
            if dt.MCC > lr.MCC else
            "but its step-wise boundaries are coarser than a smooth linear score, so it does worse than Logistic Regression."))
@@ -372,9 +373,10 @@ def observations(m: pd.DataFrame, meta: dict) -> dict:
         "The RBF kernel learns a smooth non-linear margin on the standardised features "
         f"(trained on a stratified {meta['best_params']['Support Vector Machine']['train_rows']:,}-row "
         "subsample because kernel SVM training scales as O(n²)). "
-        + ("Its high AUC shows a very good ranking of high vs low performers."
+        + (f"Its AUC ({svm.AUC:.4f}) is close to the best, so it ranks high vs low performers very well."
            if svm.AUC >= m["AUC"].max() - 0.01 else
-           "Its AUC is below the best model, so the kernel margin offers no advantage on this data."))
+           f"Its AUC ({svm.AUC:.4f}) is below the best ({m['AUC'].max():.4f}), so its probability "
+           "ranking is weaker than its final predictions."))
     runner = m.sort_values(["MCC", "F1", "AUC"], ascending=False).index[1]
     b = m.loc[best]
     o["Overall, Winner for your dataset?"] = (
@@ -424,8 +426,9 @@ Streamlit web app.
 * **Features used ({len(nf)}):** {', '.join(nf)}.
 * **Columns removed:** {dropped}.
   These columns were removed because they are the rating itself, rating-derived composite scores,
-  whole-tournament aggregates or the Player-of-the-Match flag (all would leak the target), or because
-  they are identifiers or high-cardinality names.
+  whole-tournament aggregates or Player-of-the-Match awards (all would leak the target), or because
+  they are identifiers or high-cardinality names, or because their absolute correlation with the
+  rating was ≥ 0.90 (automatic leakage check).
 * **Pre-processing:** median/mode imputation, StandardScaler for numeric features, One-Hot encoding for
   categorical features. The preprocessing is fitted on the training split only and stored inside each saved pipeline.
 * **Split:** stratified 80/20 train/test (random_state = 42) → {meta['train_rows']:,} train /
