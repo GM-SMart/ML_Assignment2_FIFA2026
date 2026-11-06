@@ -36,8 +36,8 @@ Streamlit web app.
   10,920 test rows. The test split is provided as `test_data.csv`.
 
 ## c. GitHub Repository Link
-* **GitHub repository:** "https://github.com/GM-SMart/ML_Assignment2_FIFA2026"
-* **Live Streamlit app:** "https://2026ak05355-ml-assignment2.streamlit.app/"
+* **GitHub repository:** https://github.com/GM-SMart/ML_Assignment2_FIFA2026
+* **Live Streamlit app:** https://2026ak05355-ml-assignment2.streamlit.app/
 
 ```
 project-folder/
@@ -71,12 +71,12 @@ SVM uses an RBF kernel with C = 1 and gamma = 'scale'.
 
 | ML Model Name | Observation about model performance |
 |---|---|
-| Logistic Regression | Rank 4/5 by MCC (train acc 0.8824 vs test acc 0.8848, gap -0.0024). Train and test scores are close, so it generalises well (no overfitting). It is beaten by the non-linear models, which means interactions between the statistics matter. A single linear boundary misses these. Precision (0.887) and recall (0.885) are balanced. |
-| Decision Tree | Rank 1/5 by MCC (train acc 0.9273 vs test acc 0.9302, gap -0.0029). Train and test scores are close, so it generalises well (no overfitting). The tuned tree (max_depth=4, min_samples_leaf=1) is pruned to limit variance. Axis-aligned threshold splits capture non-linear rules, so it beats the linear baseline. |
-| KNN | Rank 3/5 by MCC (train acc 0.9036 vs test acc 0.9005, gap +0.0032). Train and test scores are close, so it generalises well (no overfitting). KNN (n_neighbors=11) relies on distances in a 49-feature scaled space. It is competitive here, so performance profiles form clear local neighbourhoods. It is also the slowest model at prediction time because it stores the entire training set. |
-| Naive Bayes | Rank 5/5 by MCC (train acc 0.8347 vs test acc 0.8361, gap -0.0014). Train and test scores are close, so it generalises well (no overfitting). Gaussian NB assumes the features are independent and normally distributed. Football statistics break both assumptions: shots, shots on target and xG are strongly correlated, and counts such as goals are skewed and non-Gaussian. This makes it the weakest model, and its over-confident probabilities favour precision (P=0.879, R=0.783). On the plus side, it is the fastest model to train. |
-| Support Vector Machine | Rank 2/5 by MCC (train acc 0.9273 vs test acc 0.9301, gap -0.0028). Train and test scores are close, so it generalises well (no overfitting). The RBF kernel learns a smooth non-linear margin on the standardised features (trained on a stratified 20,000-row subsample because kernel SVM training scales as O(n²)). Its AUC (0.9415) is below the best (0.9559), so its probability ranking is weaker than its final predictions. |
-| Overall, Winner for your dataset? | **Decision Tree** wins with the highest MCC (0.8687), F1 0.9355, accuracy 0.9302 and AUC 0.9559. The runner-up is Support Vector Machine (MCC 0.8685). MCC is used as the deciding metric because it accounts for all four confusion-matrix cells, so it is the most reliable single score for a binary classifier. |
+| Logistic Regression | Logistic Regression gave steady results with 88.5% accuracy and an MCC of 0.7696. Its precision (0.887) and recall (0.885) are almost the same, so it makes both kinds of mistakes equally. Train and test accuracy are very close (0.8824 vs 0.8848), so it is not overfitting. It came 4th, which suggests a straight-line boundary cannot fully separate high and low performers. |
+| Decision Tree | The Decision Tree gave the best result with 93.0% accuracy, the highest AUC (0.9559) and the highest MCC (0.8687), even with a depth of only 4. Its recall is 1.0, so it found every high performer. All of its mistakes were low performers wrongly marked as high. Train and test accuracy are almost equal, so it is not overfitting. A few simple rules are enough to separate the two classes in this dataset. |
+| KNN | KNN came 3rd with 90.1% accuracy and an MCC of 0.8020, using 11 neighbours. Its recall (0.930) is higher than its precision (0.880), so it catches most high performers but also wrongly flags some low performers. Train and test accuracy are close (0.9036 vs 0.9005), so it generalises well. It did better than Logistic Regression but stayed behind the Decision Tree and SVM. |
+| Naive Bayes | Naive Bayes was the weakest model with 83.6% accuracy and an MCC of 0.6767. It had the lowest recall (0.783), so it missed more high performers than any other model. Train and test accuracy are nearly the same, so the problem is not overfitting; the model is too simple for this data. It treats every feature as independent, but related statistics such as shots, shots on target and xG move together. |
+| Support Vector Machine | The SVM came 2nd with 93.0% accuracy and an MCC of 0.8685, almost tied with the Decision Tree. It has the same precision (0.8788) and nearly the same recall (0.9998), so it learned almost the same separation as the tree. Train and test accuracy are close, so there is no overfitting. Its AUC (0.9415) is lower than the Decision Tree's, so its scores rank players a little less well. It was trained on 20,000 rows to keep training time reasonable. |
+| Overall, Winner for your dataset? | **Decision Tree** is the winner. It has the best accuracy, F1, AUC and MCC. The SVM is almost equal, but the Decision Tree is simpler, faster and easier to explain, so it is the better choice for this dataset. |
 
 ## How to run
 ```bash
