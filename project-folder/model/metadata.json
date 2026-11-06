@@ -1,0 +1,146 @@
+{
+  "dataset": "rauffauzanrambe/fifa-world-cup-2026-player-performance-dataset",
+  "source_file": "fifa_world_cup_2026_player_performance.csv",
+  "n_rows": 54600,
+  "n_raw_columns": 75,
+  "rating_column": "player_rating",
+  "target": "high_performer",
+  "threshold": 5.5,
+  "class_balance": {
+    "1": 0.5058791208791209,
+    "0": 0.4941208791208791
+  },
+  "numeric_features": [
+    "age",
+    "jersey_number",
+    "height_cm",
+    "weight_kg",
+    "market_value_eur",
+    "goals_team",
+    "goals_opponent",
+    "minutes_played",
+    "goals",
+    "assists",
+    "shots",
+    "shots_on_target",
+    "expected_goals_xg",
+    "expected_assists_xa",
+    "key_passes",
+    "successful_passes",
+    "total_passes",
+    "pass_accuracy",
+    "dribbles_attempted",
+    "successful_dribbles",
+    "crosses",
+    "successful_crosses",
+    "tackles",
+    "interceptions",
+    "clearances",
+    "blocks",
+    "aerial_duels_won",
+    "aerial_duels_lost",
+    "recoveries",
+    "defensive_actions",
+    "fouls_committed",
+    "fouls_suffered",
+    "yellow_cards",
+    "red_cards",
+    "offsides",
+    "saves",
+    "save_percentage",
+    "punches",
+    "clean_sheet",
+    "goals_conceded",
+    "penalty_saves",
+    "distance_covered_km",
+    "sprint_distance_km",
+    "accelerations",
+    "decelerations",
+    "stamina_score",
+    "player_of_match_awards"
+  ],
+  "categorical_features": [
+    "nationality",
+    "team",
+    "position",
+    "preferred_foot",
+    "stadium",
+    "city",
+    "opponent_team",
+    "tournament_stage",
+    "match_result"
+  ],
+  "dropped_columns": {
+    "target_source / leakage": [
+      "player_rating",
+      "performance_score",
+      "offensive_contribution",
+      "defensive_contribution",
+      "possession_impact",
+      "pressure_resistance",
+      "creativity_score",
+      "consistency_score",
+      "clutch_performance_score",
+      "total_goals_tournament",
+      "total_assists_tournament",
+      "total_minutes_tournament",
+      "tournament_rating"
+    ],
+    "identifier": [
+      "player_id",
+      "player_name",
+      "club_name",
+      "match_id",
+      "match_date"
+    ],
+    "high_cardinality_text": [],
+    "constant": [],
+    "high_corr_with_rating": [
+      "top_speed_kmh"
+    ]
+  },
+  "train_rows": 43680,
+  "test_rows": 10920,
+  "best_params": {
+    "Logistic Regression": {
+      "clf__C": 10
+    },
+    "Decision Tree": {
+      "clf__max_depth": 4,
+      "clf__min_samples_leaf": 1
+    },
+    "KNN": {
+      "clf__n_neighbors": 21
+    },
+    "Naive Bayes": {
+      "clf__var_smoothing": 1e-09
+    },
+    "Support Vector Machine": {
+      "C": 1.0,
+      "kernel": "rbf",
+      "gamma": "scale",
+      "train_rows": 20000
+    }
+  },
+  "train_accuracy": {
+    "Logistic Regression": 0.8833562271062271,
+    "Decision Tree": 0.9273122710622711,
+    "KNN": 0.8874771062271062,
+    "Naive Bayes": 0.8340201465201466,
+    "Support Vector Machine": 0.9272893772893773
+  },
+  "model_files": {
+    "Logistic Regression": "logistic_regression.pkl",
+    "Decision Tree": "decision_tree.pkl",
+    "KNN": "knn.pkl",
+    "Naive Bayes": "naive_bayes.pkl",
+    "Support Vector Machine": "svm.pkl"
+  },
+  "versions": {
+    "python": "3.14.7",
+    "scikit-learn": "1.9.1",
+    "numpy": "2.5.4",
+    "pandas": "3.1.1",
+    "joblib": "1.6.0"
+  }
+}
